@@ -1,13 +1,13 @@
 //Library
-import express from 'express'
+import express from "express";
+import passport from "passport";
 
 //Models
-import {UserModel} from '../../database/user/index'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import { UserModel } from "../../database/user/index";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-const Router=express.Router();
-
+const Router = express.Router();
 
 // Route:      /auth/signup
 // Desc:       Register New user
@@ -15,46 +15,73 @@ const Router=express.Router();
 // Access:     Public
 // Method:     POST
 
-Router.post("/signup",async(request,response)=>{
-    try{
-        //const {fullname,email,phoneNumber,password}=request.body.credentials
-        
-        await UserModel.findByEmailAndPhone(request.body.credentials);
+Router.post("/signup", async (request, response) => {
+  try {
+    //const {fullname,email,phoneNumber,password}=request.body.credentials
 
-        //hash password
-        // const bcryptSalt  = await bcrypt.genSalt(8);
-        // const hashedPassword = await bcrypt.hash(password,bcryptSalt)
+    await UserModel.findByEmailAndPhone(request.body.credentials);
 
-        //save to DB
-        //await UserModel.create({...request.body.credentials,password:hashedPassword})
-        const newUser= await UserModel.create(request.body.credentials)
+    //hash password
+    // const bcryptSalt  = await bcrypt.genSalt(8);
+    // const hashedPassword = await bcrypt.hash(password,bcryptSalt)
 
-        //generate JWT auth token
-        // const token =jwt.sign({user:{fullname,email}},"ZomatoApp")
-        const token = newUser.generateJWTToken()
+    //save to DB
+    //await UserModel.create({...request.body.credentials,password:hashedPassword})
+    const newUser = await UserModel.create(request.body.credentials);
 
-        return response.status(200).json({token,status:"success"})
+    //generate JWT auth token
+    // const token =jwt.sign({user:{fullname,email}},"ZomatoApp")
+    const token = newUser.generateJWTToken();
 
-    }catch(error){
-        return response.status(500).json({error:error.message})
-    }
-})
-
+    return response.status(200).json({ token, status: "success" });
+  } catch (error) {
+    return response.status(500).json({ error: error.message });
+  }
+});
 
 // Route:      /auth/signin
 // Desc:       Sign in user using email and password
 // Params:     none
 // Access:     Public
 // Method:     POST
-Router.post("/signin",async(request,response)=>{
-    try{
-        const user= await UserModel.findByEmailAndPassword(request.body.credentials)
-        const token=user.generateJWTToken()
-        return response.status(200).json({token,status:"success"})
+Router.post("/signin", async (request, response) => {
+  try {
+    const user = await UserModel.findByEmailAndPassword(
+      request.body.credentials
+    );
+    const token = user.generateJWTToken();
+    return response.status(200).json({ token, status: "success" });
+  } catch (error) {
+    return response.status(500).json({ error: error.message });
+  }
+});
 
-    }catch(error){
-        return response.status(500).json({error:error.message})
-    }
+// Route:      /auth/google
+// Desc:       Sign in user using email and password
+// Params:     none
+// Access:     Public
+// Method:     GET
+Router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ],
+  })
+);
+
+// Route:      /auth/google/callback
+// Desc:       Sign in user using email and password
+// Params:     none
+// Access:     Public
+// Method:     GET
+Router.get(
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  (request, response) => {
+         return response.json({token: request.session.passport.user.token})
+    //   return response.redirect(`http://localhost:4000/google/${request.session.passport.user.token}`)
 })
 
 
