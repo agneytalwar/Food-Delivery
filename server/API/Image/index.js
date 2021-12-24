@@ -1,11 +1,14 @@
 //Libraries
 import express from 'express'
-import AWS from 'aws-sdk'
+// import AWS from 'aws-sdk'
 import multer from 'multer'
 
 
 //Database model
 import {ImageModel} from '../../database/allModels'
+
+//upload to s3
+import {s3Upload} from '../../Utils/AWS/s3'
 
 const Router=express.Router()
 
@@ -13,12 +16,12 @@ const Router=express.Router()
 const storage=multer.memoryStorage()
 const upload =multer({storage})
 
-//AWS s3 bucket
-const s3Bucket= new AWS.S3({
-    accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_S3_SECRET_KEY,
-    region: 'ap-south-1'
-})
+// //AWS s3 bucket
+// const s3Bucket= new AWS.S3({
+//     accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+//     secretAccessKey: process.env.AWS_S3_SECRET_KEY,
+//     region: 'ap-south-1'
+// })
 
 // Route:      /image
 // Desc:       Uploads given image to S3 bucket and save file link to mongodb
@@ -37,12 +40,12 @@ Router.post("/",upload.single('file'), async(request,response)=>{
             ContentType: file.mimetype,
             ACL:"public-read"//Access Control List
         }
-        const s3Upload = () =>{
-            return new Promise((resolve,reject)=> s3Bucket.upload(options,(error,data)=>{
-                if(error) return reject(error)
-                return resolve(data)
-            }))
-        }
+        // const s3Upload = (options) =>{
+        //     return new Promise((resolve,reject)=> s3Bucket.upload(options,(error,data)=>{
+        //         if(error) return reject(error)
+        //         return resolve(data)
+        //     }))
+        // }
 
         const uploadImage= await s3Upload(bucketOptions)
 
