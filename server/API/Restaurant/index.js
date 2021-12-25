@@ -6,6 +6,10 @@ const Router=express.Router()
 import {RestaurantModel} from '../../database/allModels'
 // import {RestaurantModel} from '../../database/restaurant/index'
 
+//validation
+import {ValidateRestaurantCity,ValidateSearchString} from '../../validation/restaurant'
+import {ValidateRestaurantId} from '../../validation/food'
+
 // Route:      /restaurant
 // Desc:       Get all restaurant details filtered by city
 // Params:     none(we will use queries)
@@ -14,6 +18,7 @@ import {RestaurantModel} from '../../database/allModels'
 // eg: http:/localhost:4000/restaurant/?city=ncr
 Router.get("/",async(request,response)=>{
     try{
+        await ValidateRestaurantCity(request.query)
         const {city}=request.query
         const restaurants= await RestaurantModel.find({city});
 
@@ -30,6 +35,7 @@ Router.get("/",async(request,response)=>{
 // Method:     GET
 Router.get("/:_id",async  function(request,response){
     try{
+        await ValidateRestaurantId(request.params)
         const {_id}=request.params
         const reqdRestaurant=await RestaurantModel.findById(_id)
         if(!reqdRestaurant){
@@ -49,6 +55,7 @@ Router.get("/:_id",async  function(request,response){
 // Method:     GET
 Router.get("/search",async (request,response)=>{
     try{
+        await ValidateSearchString(request.body)
         const {searchString}= request.body
         const restaurants= await RestaurantModel.find({
             name:{ $regex:searchString , $options:"i"}

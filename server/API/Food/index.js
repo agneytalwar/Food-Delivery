@@ -7,6 +7,9 @@ const Router=express.Router()
 import {FoodModel} from '../../database/allModels'
 // import {FoodModel} from '../../database/food/index'
 
+//Validation
+import {ValidateRestaurantId,Validatecategory} from '../../validation/food'
+
 // Route:      food/r/:_id
 // Desc:       Get all foods of a particular restaurant
 // Params:     _id
@@ -14,6 +17,7 @@ import {FoodModel} from '../../database/allModels'
 // Method:     GET
 Router.get("r/:_id",async (request,response)=>{
     try{
+        await ValidateRestaurantId(request.params)
         const {_id}=request.params
         const foodItems= await FoodModel.find({restaurant : _id})
         if(!foodItems){
@@ -33,6 +37,7 @@ Router.get("r/:_id",async (request,response)=>{
 // Method:     GET
 Router.get("/c/:category",async (request,response)=>{
     try{
+        await Validatecategory(request.params)
         const {category}=request.params
         const foodOfCategory= await FoodModel.find({category : {$regex: category ,$options: 'i'}}) 
         if(!foodOfCategory){

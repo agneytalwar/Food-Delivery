@@ -7,6 +7,9 @@ import { UserModel } from "../../database/user/index";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+//validation
+import {ValidateSignin,ValidateSignup} from '../../validation/auth'
+
 const Router = express.Router();
 
 // Route:      /auth/signup
@@ -18,7 +21,7 @@ const Router = express.Router();
 Router.post("/signup", async (request, response) => {
   try {
     //const {fullname,email,phoneNumber,password}=request.body.credentials
-
+    await ValidateSignup(request.body.credentials)
     await UserModel.findByEmailAndPhone(request.body.credentials);
 
     //hash password
@@ -46,6 +49,7 @@ Router.post("/signup", async (request, response) => {
 // Method:     POST
 Router.post("/signin", async (request, response) => {
   try {
+    await ValidateSignin(request.body.credentials)
     const user = await UserModel.findByEmailAndPassword(
       request.body.credentials
     );
@@ -57,7 +61,7 @@ Router.post("/signin", async (request, response) => {
 });
 
 // Route:      /auth/google
-// Desc:       Sign in user using email and password
+// Desc:       Route for google authentication
 // Params:     none
 // Access:     Public
 // Method:     GET
@@ -72,7 +76,7 @@ Router.get(
 );
 
 // Route:      /auth/google/callback
-// Desc:       Sign in user using email and password
+// Desc:       google callback function
 // Params:     none
 // Access:     Public
 // Method:     GET

@@ -1,5 +1,6 @@
 //Libraries
 import express from 'express'
+import passport from 'passport'
 
 //Database models
 import {OrderModel} from '../../database/allModels'
@@ -11,7 +12,7 @@ const Router=express.Router()
 // Params:     _id
 // Access:     Public
 // Method:     GET
-Router.get("/:_id",async (request,response)=>{
+Router.get("/:_id", passport.authenticate('jwt',{session : false}) ,async (request,response)=>{
     try{
         const {_id}=request.params
         const orders= await OrderModel.findOne({user:_id})
@@ -29,7 +30,7 @@ Router.get("/:_id",async (request,response)=>{
 // Params:     _id
 // Access:     Public
 // Method:     POST
-Router.post("/new/:_id",async(request,response)=>{
+Router.post("/new/:_id",passport.authenticate('jwt',{session:false}) ,async(request,response)=>{
     try{
         const {_id}=request.params
         
