@@ -55,7 +55,7 @@ function DeliveryCarousel() {
           responsive:[
               {
                   breakpoint:1299,
-                  setting:{
+                  settings:{
                       slidesToShow:4
                   }
               }
@@ -64,7 +64,7 @@ function DeliveryCarousel() {
     return (<>
         <div>
             <h1 className='text-xl mb-4 font-semibold'>Inspiration for your first order</h1>
-            <div className='lg:hidden flex gap-3 flex-wrap justify-between'>
+            <div className='lg:hidden flex gap-3 flex-wrap justify-center'>
                 {categories.map((food)=>(
                     <DeliveryCategory {...food}/>
                 ))}
